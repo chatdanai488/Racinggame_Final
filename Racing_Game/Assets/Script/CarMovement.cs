@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class CarMovement : MonoBehaviour
 {
@@ -34,7 +35,7 @@ public class CarMovement : MonoBehaviour
     [SerializeField] private Transform RLTF;
     [SerializeField] private Transform RRTF;
 
-
+    public string PlayerOrAI;
     // Start is called before the first frame update
 
     private void Start()
@@ -43,7 +44,10 @@ public class CarMovement : MonoBehaviour
     }
     private void FixedUpdate()
     {
-        getInput();
+        if (PlayerOrAI == "Player")
+        {
+            getInput();
+        }
         HandleMotor();
         HandleSteering();
         UpdateWheels();
@@ -58,11 +62,11 @@ public class CarMovement : MonoBehaviour
 
         if(vtinput == 1)
         {
-            vtspeed += 1;
+            StartCoroutine(Accelerate(1));
         }
         else if(vtinput == -1)
         {
-            vtspeed -= 1;
+            StartCoroutine(Accelerate(-1));
         }
         else
         {
@@ -76,8 +80,12 @@ public class CarMovement : MonoBehaviour
 
 
     }
-
-    private void HandleMotor()
+    private IEnumerator Accelerate(int speed)
+    {
+        yield return new WaitForSeconds(0.1f);
+        vtspeed = vtspeed + 1;
+    }
+    public void HandleMotor()
     {
 
         FLWC.motorTorque = MotorForce * (vtinput +(vtspeed/10000)) ;
@@ -109,7 +117,10 @@ public class CarMovement : MonoBehaviour
 
     private void HandleSteering()
     {
-        steerAngle = MaxsteerAngle * hrinput;
+        if (PlayerOrAI == "Player")
+        {
+            steerAngle = MaxsteerAngle * hrinput;
+        }
         FRWC.steerAngle = steerAngle;
         FLWC.steerAngle = steerAngle;
 
@@ -132,5 +143,11 @@ public class CarMovement : MonoBehaviour
         FLTF.position = pos;
     }
 
+    public void SetInput(int steer, float Angle)
+    {
+        vtinput = steer;
+        steerAngle = Angle;
+        HandleMotor();
+    }
 
 }
