@@ -62,28 +62,29 @@ public class CarMovement : MonoBehaviour
 
         if(vtinput == 1)
         {
-            StartCoroutine(Accelerate(1));
+            StartCoroutine(Accelerate(vtinput));
         }
         else if(vtinput == -1)
         {
-            StartCoroutine(Accelerate(-1));
+            StartCoroutine(Accelerate(vtinput));
         }
         else
         {
             vtspeed = 0;
         }
         
-        if(vtspeed >= Maxvtspeed)
-        {
-            vtspeed = Maxvtspeed;
-        }
+        
 
 
     }
-    private IEnumerator Accelerate(int speed)
+    private IEnumerator Accelerate(float speed)
     {
         yield return new WaitForSeconds(0.1f);
-        vtspeed = vtspeed + 1;
+        vtspeed = vtspeed + speed;
+        if (vtspeed >= Maxvtspeed)
+        {
+            vtspeed = Maxvtspeed;
+        }
     }
     public void HandleMotor()
     {
@@ -143,11 +144,28 @@ public class CarMovement : MonoBehaviour
         FLTF.position = pos;
     }
 
-    public void SetInput(int steer, float Angle)
+    public void SetInput(float steer, float Angle, bool brake, float AIbreakforce)
     {
-        vtinput = steer;
-        steerAngle = Angle;
-        HandleMotor();
+        if (brake)
+        {
+            vtinput = -1;
+            steerAngle = Angle;
+            isbreak = brake;
+            breakforce = AIbreakforce;
+            if(vtspeed < 800)
+            {
+                vtspeed = 800;
+            }
+        }
+        else
+        {
+            vtinput = steer;
+            steerAngle = Angle;
+            isbreak = brake;
+            breakforce = AIbreakforce;
+        }
+        StartCoroutine(Accelerate(vtinput));
+
     }
 
 }
