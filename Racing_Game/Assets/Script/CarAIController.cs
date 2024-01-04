@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -13,6 +14,8 @@ public class CarAIController : MonoBehaviour
     private CarMovement CarMovement;
     public float WaypointRange;
     private float CurrentAngle;
+
+    public GameObject Car;
 
 
     private bool isbreak;
@@ -43,12 +46,21 @@ public class CarAIController : MonoBehaviour
             CarMovement.SetInput(1,CurrentAngle,false,3000);
         }
 
-        Quaternion eulerangles = transform.rotation;
-        
-        if(eulerangles.x > 45 || eulerangles.x < -45 || eulerangles.z > 45 || eulerangles.z < -45)
+        Vector3 eulerangles = transform.rotation.eulerAngles;
+        float TrueeulerX = eulerangles.x;
+        float TrueeulerZ = eulerangles.z;
+        if(TrueeulerX > 300f)
         {
-            ResetCar(eulerangles);
+            TrueeulerX = TrueeulerX - 360f;
         }
+        if(TrueeulerZ > 300f)
+        {
+            TrueeulerZ = TrueeulerZ - 360f;
+        }
+        TrueeulerX = Mathf.Clamp(TrueeulerX, -45f, 45f);
+        TrueeulerZ = Mathf.Clamp(TrueeulerZ, -45f, 45f);
+
+        Car.transform.rotation = Quaternion.Euler(TrueeulerX, eulerangles.y, TrueeulerZ);
         
         Debug.Log(eulerangles);
         Debug.DrawRay(transform.position, Waypoints[CurrentWaypoint].position - transform.position, Color.yellow);
@@ -57,7 +69,7 @@ public class CarAIController : MonoBehaviour
     {
         if (other.gameObject.CompareTag("BreakPoint"))
         {
-            CarMovement.SetInput(1, CurrentAngle, true, 150000);
+            CarMovement.SetInput(1, CurrentAngle, true, 2000);
             isbreak = true;
         }
         if (other.gameObject.CompareTag("SlowField"))
@@ -75,7 +87,7 @@ public class CarAIController : MonoBehaviour
         if (other.gameObject.CompareTag("SlowField"))
         {
             StartCoroutine(EngineStart());
-            ;
+            
         }
     }
     private IEnumerator EngineStart()
@@ -84,9 +96,9 @@ public class CarAIController : MonoBehaviour
         isbreak = false;
         
     }
-    private void ResetCar(Quaternion eulerAngles)
+    private void ResetCar(Vector3 eulerAngles)
     {
-        transform.position = new Vector3(transform.position.x, 10, transform.position.z);
-        eulerAngles = new Quaternion(0,eulerAngles.y,0,0);
+        Car.transform.position = new Vector3(transform.position.x, 100, transform.position.z);
+        Car.transform.rotation = new Quaternion(0,-eulerAngles.y,0,0);
     }
 }

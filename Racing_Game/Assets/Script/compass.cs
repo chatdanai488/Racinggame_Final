@@ -15,7 +15,7 @@ public class compass : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        dir.z = target.eulerAngles.y;
+        dir.z = - target.eulerAngles.y;
         transform.localEulerAngles = dir;
     }
 }

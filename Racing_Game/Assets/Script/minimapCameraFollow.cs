@@ -5,7 +5,7 @@ using UnityEngine;
 public class minimapCameraFollow : MonoBehaviour
 {
     public Transform target;
-    public Transform target2;
+    
     
     // Start is called before the first frame update
     void Start()

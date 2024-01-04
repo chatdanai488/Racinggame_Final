@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Data;
 using UnityEngine;
 using UnityEngine.UIElements;
-
+using TMPro;
 public class CarMovement : MonoBehaviour
 {
     private const string hr = "Horizontal";
@@ -36,11 +36,24 @@ public class CarMovement : MonoBehaviour
     [SerializeField] private Transform RRTF;
 
     public string PlayerOrAI;
+
+    public WaypointContainer WaypointContainer;
+    public List<Transform> Waypoints;
+    public int CurrentWaypoint;
+    public float WaypointRange;
+
+    public TextMeshProUGUI Score;
     // Start is called before the first frame update
 
     private void Start()
     {
         source = GetComponent<AudioSource>();
+        if (PlayerOrAI == "Player")
+        {
+            Waypoints = WaypointContainer.Waypoint;
+            CurrentWaypoint = 0;
+        }
+        
     }
     private void FixedUpdate()
     {
@@ -53,7 +66,13 @@ public class CarMovement : MonoBehaviour
         UpdateWheels();
         
     }
-
+    private void Update()
+    {
+        if (PlayerOrAI == "Player")
+        {
+            AddScore();
+        }
+    }
     private void getInput()
     {
         hrinput = Input.GetAxis(hr);
@@ -71,6 +90,7 @@ public class CarMovement : MonoBehaviour
         else
         {
             vtspeed = 0;
+            StartCoroutine(Accelerate(-1));
         }
         
         
@@ -148,14 +168,11 @@ public class CarMovement : MonoBehaviour
     {
         if (brake)
         {
-            vtinput = -1;
+            vtinput = 1;
             steerAngle = Angle;
+            vtspeed = 1000;
             isbreak = brake;
             breakforce = AIbreakforce;
-            if(vtspeed < 800)
-            {
-                vtspeed = 800;
-            }
         }
         else
         {
@@ -168,4 +185,15 @@ public class CarMovement : MonoBehaviour
 
     }
 
+    private void AddScore()
+    {
+        int CurrentScore = int.Parse(Score.text);
+        if (Vector3.Distance(Waypoints[CurrentWaypoint].position, transform.position) < WaypointRange)
+        {
+            CurrentWaypoint++;
+            if (CurrentWaypoint == Waypoints.Count) CurrentWaypoint = 0;
+            CurrentScore = CurrentScore + 120;
+            Score.text = CurrentScore.ToString();
+        }
+    }
 }
