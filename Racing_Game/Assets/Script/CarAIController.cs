@@ -57,19 +57,23 @@ public class CarAIController : MonoBehaviour
         {
             TrueeulerZ = TrueeulerZ - 360f;
         }
+        
+        if (!(TrueeulerX > -45f && TrueeulerX < 45f) || !!(TrueeulerZ > -45f && TrueeulerZ < 45f))
+        {
+            Car.transform.rotation = Quaternion.Euler(0, eulerangles.y, 0);
+        }
         TrueeulerX = Mathf.Clamp(TrueeulerX, -45f, 45f);
         TrueeulerZ = Mathf.Clamp(TrueeulerZ, -45f, 45f);
-
         Car.transform.rotation = Quaternion.Euler(TrueeulerX, eulerangles.y, TrueeulerZ);
         
-        Debug.Log(eulerangles);
+        
         Debug.DrawRay(transform.position, Waypoints[CurrentWaypoint].position - transform.position, Color.yellow);
     }
     private void OnTriggerStay(Collider other)
     {
         if (other.gameObject.CompareTag("BreakPoint"))
         {
-            CarMovement.SetInput(1, CurrentAngle, true, 2000);
+            CarMovement.SetInput(1, CurrentAngle, false, 1000);
             isbreak = true;
         }
         if (other.gameObject.CompareTag("SlowField"))
@@ -90,6 +94,13 @@ public class CarAIController : MonoBehaviour
             
         }
     }
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("OutBounds"))
+        {
+            ResetCarPosition();
+        }
+    }
     private IEnumerator EngineStart()
     {
         yield return new WaitForSeconds(0.2f);
@@ -100,5 +111,9 @@ public class CarAIController : MonoBehaviour
     {
         Car.transform.position = new Vector3(transform.position.x, 100, transform.position.z);
         Car.transform.rotation = new Quaternion(0,-eulerAngles.y,0,0);
+    }
+    public void ResetCarPosition()
+    {
+        Car.transform.position = Waypoints[CurrentWaypoint].position;
     }
 }

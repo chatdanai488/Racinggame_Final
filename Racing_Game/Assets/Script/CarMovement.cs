@@ -111,7 +111,6 @@ public class CarMovement : MonoBehaviour
 
         FLWC.motorTorque = MotorForce * (vtinput +(vtspeed/10000)) ;
         FRWC.motorTorque = MotorForce * (vtinput + (vtspeed / 10000)) ;
-        print(FLWC.motorTorque);
     
 
        
@@ -195,5 +194,9 @@ public class CarMovement : MonoBehaviour
             CurrentScore = CurrentScore + 120;
             Score.text = CurrentScore.ToString();
         }
+    }
+    public float GetSpeed()
+    {
+        return vtspeed;
     }
 }
